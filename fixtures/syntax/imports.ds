@@ -1,0 +1,5 @@
+import "./common": Utils
+import "../shared/types.ds": A, B, C as D
+
+def use(utils: Utils, value: D) -> A =
+    Utils.make(value)

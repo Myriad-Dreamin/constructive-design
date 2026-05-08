@@ -1,0 +1,6 @@
+def describe(value: Int) -> String = value match {
+  case 0 | 1 => "small"
+  case n if n > 10 => "large"
+  case ??? => "unknown"
+  case _ => throw s"bad {value}"
+}

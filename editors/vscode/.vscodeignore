@@ -1,0 +1,12 @@
+.git/
+.gitignore
+node_modules/
+src/
+tsconfig.json
+
+*.log
+*.vsix
+dist/server.js
+dist/**/*.map
+
+syntaxes/textmate/

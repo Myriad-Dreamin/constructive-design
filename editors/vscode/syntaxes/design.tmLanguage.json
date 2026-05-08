@@ -1,0 +1,198 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Design",
+  "scopeName": "source.design",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#interpolatedStringPattern"
+    },
+    {
+      "include": "#tripleStringPattern"
+    },
+    {
+      "include": "#stringPattern"
+    },
+    {
+      "include": "#annotation"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#numeric"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#functionIdentifier"
+    },
+    {
+      "include": "#enumCaseIdentifier"
+    },
+    {
+      "include": "#callIdentifier"
+    },
+    {
+      "include": "#typeIdentifier"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#punctuation"
+    },
+    {
+      "include": "#identifier"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "include": "#blockComment"
+        },
+        {
+          "include": "#lineComment"
+        }
+      ]
+    },
+    "blockComment": {
+      "name": "comment.block.design",
+      "begin": "\\/\\*",
+      "end": "\\*\\/",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.design"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.design"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#blockComment"
+        }
+      ]
+    },
+    "lineComment": {
+      "name": "comment.line.double-slash.design",
+      "begin": "\\/\\/",
+      "end": "(?=$|\\n)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.design"
+        }
+      }
+    },
+    "escape": {
+      "name": "constant.character.escape.design",
+      "match": "\\\\."
+    },
+    "stringPattern": {
+      "name": "string.quoted.double.design",
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.design"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.design"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "tripleStringPattern": {
+      "name": "string.quoted.double.design",
+      "begin": "\"\"\"",
+      "end": "\"\"\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.design"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.design"
+        }
+      },
+      "patterns": []
+    },
+    "interpolatedStringPattern": {
+      "name": "string.interpolated.design",
+      "begin": "\\bs\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.design"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.design"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "annotation": {
+      "name": "entity.name.function.decorator.design",
+      "match": "(?<=@)[\\p{XID_Start}_][\\p{XID_Continue}_]*"
+    },
+    "constants": {
+      "name": "constant.language.design",
+      "match": "\\b(?:true|false|null)\\b|\\?\\?\\?"
+    },
+    "numeric": {
+      "name": "constant.numeric.design",
+      "match": "\\b(?:0x[\\da-fA-F]+|0o[0-7]+|0b[01]+|\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)\\b"
+    },
+    "keywords": {
+      "name": "keyword.control.design",
+      "match": "\\b(?:enum|class|def|case|match|if|else|for|while|throw|return|val|var|type|import|from|as|and|or|not|in|this)\\b"
+    },
+    "functionIdentifier": {
+      "name": "entity.name.function.design",
+      "match": "(?<=\\bdef\\s+)[\\p{XID_Start}_][\\p{XID_Continue}_]*"
+    },
+    "enumCaseIdentifier": {
+      "name": "entity.name.type.enum-member.design",
+      "match": "(?<=\\bcase\\s+)[\\p{XID_Start}_][\\p{XID_Continue}_]*"
+    },
+    "callIdentifier": {
+      "name": "entity.name.function.call.design",
+      "match": "\\b[\\p{XID_Start}_][\\p{XID_Continue}_]*(?=\\s*\\()"
+    },
+    "typeIdentifier": {
+      "name": "entity.name.type.design",
+      "match": "\\b(?:[A-Z][\\p{XID_Continue}_]*|String|Boolean|Double|Float|Int|Long|Unit)\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.design",
+      "match": "=>|->|==|!=|<=|>=|&&|\\|\\||[+\\-*\\/%<>:=|&!]"
+    },
+    "punctuation": {
+      "name": "punctuation.separator.design",
+      "match": "[;,]"
+    },
+    "identifier": {
+      "name": "variable.other.readwrite.design",
+      "match": "\\b[\\p{XID_Start}_][\\p{XID_Continue}_]*\\b"
+    }
+  }
+}

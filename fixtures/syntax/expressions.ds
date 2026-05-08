@@ -1,0 +1,8 @@
+def arithmetic(a: Int, b: Int) -> Int = a + b * 2 - -1
+
+def calls(service: Service) -> Result = service.prepare("raw").run(???, true)
+
+def blocky(input: Input) -> Output = {
+  @trace input.normalize();
+  throw s"bad {input}"
+}

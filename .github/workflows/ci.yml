@@ -1,0 +1,211 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Scala tools
+        uses: coursier/setup-action@v1
+        with:
+          jvm: temurin:17
+          apps: scala-cli,sbt
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.16.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension
+          path: editors/vscode/*.vsix
+          if-no-files-found: error
+
+  build-cli:
+    name: Build CLI (${{ matrix.target }})
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            os: ubuntu-latest
+            archive_extension: tar.gz
+          - target: macos-x64
+            os: macos-15-intel
+            archive_extension: tar.gz
+          - target: windows-x64
+            os: windows-latest
+            archive_extension: zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Scala tools
+        uses: coursier/setup-action@v1
+        with:
+          jvm: temurin:17
+          apps: scala-cli,sbt
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.16.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build CLI executable
+        shell: bash
+        run: |
+          mkdir -p editors/vscode/dist/scala/design-ls
+          scala-cli package \
+            packages/design/src/main/scala \
+            packages/design-ls/src/main/scala \
+            --power \
+            --js \
+            --js-module-kind esmodule \
+            --js-mode fastLinkJS \
+            --output editors/vscode/dist/scala/design-ls/main.js \
+            --force \
+            --server=false
+          pnpm exec tsc -p tsconfig.json
+          node scripts/build-sea.mjs
+
+      - name: Prepare CLI asset name
+        id: cli_asset
+        shell: bash
+        run: echo "file=dsc-${GITHUB_REF_NAME#v}-${{ matrix.target }}.${{ matrix.archive_extension }}" >> "$GITHUB_OUTPUT"
+
+      - name: Package POSIX CLI
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p release
+          tar -czf "release/${{ steps.cli_asset.outputs.file }}" -C dist dsc
+
+      - name: Package Windows CLI
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release | Out-Null
+          Compress-Archive -Path dist/dsc.exe -DestinationPath "release/${{ steps.cli_asset.outputs.file }}" -Force
+
+      - name: Upload CLI
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}
+          path: release/${{ steps.cli_asset.outputs.file }}
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+      - build-cli
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.16.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install parse-changelog
+        run: cargo install parse-changelog --version 0.6.12 --locked
+
+      - name: Download VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: vscode-extension
+          path: release
+
+      - name: Download CLI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cli-*
+          path: release
+          merge-multiple: true
+
+      - name: Draft release notes
+        run: pnpm draft-release "${{ github.ref_name }}"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          assets=(release/*)
+          if [ ! -e "${assets[0]}" ]; then
+            echo "No release assets found in release/."
+            exit 1
+          fi
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "${assets[@]}" --clobber
+            gh release edit "$TAG_NAME" --title "$TAG_NAME" --notes-file target/announcement.gen.md
+          else
+            gh release create "$TAG_NAME" "${assets[@]}" --title "$TAG_NAME" --notes-file target/announcement.gen.md
+          fi

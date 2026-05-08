@@ -1,0 +1,18 @@
+enum Mode {
+  case cold
+  @default
+  case warm;
+  case hot
+}
+
+def choose(mode: Mode, fallback: Option.Mode): Result.Value = mode
+
+class Workflow(id: String) {
+  @initial
+  case Idle;
+  case Running;
+  @terminal
+  case Done;
+
+  def current: Workflow = this
+}

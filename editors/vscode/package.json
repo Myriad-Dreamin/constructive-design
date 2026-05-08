@@ -1,0 +1,83 @@
+{
+  "name": "constructive-design",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "displayName": "Constructive Design",
+  "description": "Design language support for VSCode.",
+  "publisher": "constructive-design",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Myriad-Dreamin/constructive-design.git",
+    "directory": "editors/vscode"
+  },
+  "private": true,
+  "type": "module",
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "onLanguage:design",
+    "onCommand:design.compileToCxx"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "engines": {
+    "vscode": "^1.82.0"
+  },
+  "scripts": {
+    "build:syntax": "node syntaxes/textmate/main.mts",
+    "build:scala-ls": "pnpm --dir ../.. scala:ls:fastLink",
+    "build:bundle": "rm -f dist/server.js dist/server.js.map dist/server.cjs && esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.cjs && esbuild src/server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs",
+    "build:server": "pnpm build:scala-ls && pnpm build:bundle",
+    "build:vscode": "pnpm build:syntax && pnpm build:server && pnpm package",
+    "local:vscode": "pnpm build:vscode && code --install-extension constructive-design-0.1.0.vsix",
+    "package": "vsce package --no-dependencies",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "contributes": {
+    "configurationDefaults": {
+      "[design]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.wordWrap": "on"
+      }
+    },
+    "commands": [
+      {
+        "command": "design.compileToCxx",
+        "title": "Compile to C++",
+        "category": "Design"
+      }
+    ],
+    "languages": [
+      {
+        "id": "design",
+        "aliases": [
+          "Design",
+          "design",
+          "ds"
+        ],
+        "extensions": [
+          ".ds"
+        ],
+        "configuration": "./syntaxes/language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "design",
+        "scopeName": "source.design",
+        "path": "./syntaxes/design.tmLanguage.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.82.0",
+    "@vscode/vsce": "^3.9.1",
+    "esbuild": "^0.28.0",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1"
+  }
+}
