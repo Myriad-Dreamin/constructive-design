@@ -110,7 +110,37 @@ const main = async () => {
     fail(`Missing changelog: ${changelogPath}`);
   }
 
-  const changelog = await run('parse-changelog', [changelogPath, versionToRelease]);
+  let changelog;
+  try {
+    changelog = await run('parse-changelog', [changelogPath, versionToRelease]);
+  } catch {
+    changelog = '';
+  }
+
+  // Fallback: for pre-release versions (e.g. 0.1.0-rc1), try the base version (0.1.0)
+  // and then rewrite the version header in the extracted changelog.
+  if (!changelog) {
+    const baseVersion = versionToRelease.replace(/-rc\d+$/, '');
+    if (baseVersion !== versionToRelease) {
+      try {
+        changelog = await run('parse-changelog', [changelogPath, baseVersion]);
+      } catch {
+        changelog = '';
+      }
+      if (changelog) {
+        changelog = changelog
+          .replace(
+            new RegExp(`^##\\s+v?${baseVersion.replace(/\./g, '\\.')}\\b`, 'm'),
+            `## v${versionToRelease}`,
+          )
+          .replace(
+            new RegExp(`/commits/v${baseVersion.replace(/\./g, '\\.')}(?!-)`, 'g'),
+            `/commits/v${versionToRelease}`,
+          );
+      }
+    }
+  }
+
   if (!changelog) {
     fail(`No changelog entry found for ${versionToRelease} in ${changelogPath}`);
   }
