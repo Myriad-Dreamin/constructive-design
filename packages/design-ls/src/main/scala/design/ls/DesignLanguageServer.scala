@@ -30,7 +30,7 @@ class DesignLanguageServer {
         change = 1
       )
     )
-    val serverInfo = js.Dynamic.literal(name = "design-ls", version = "0.1.0")
+    val serverInfo = js.Dynamic.literal(name = "design-ls", version = "0.1.0-rc1")
 
     js.Dynamic.literal(capabilities = capabilities, serverInfo = serverInfo).asInstanceOf[js.Object]
   }

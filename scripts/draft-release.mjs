@@ -90,7 +90,7 @@ const generateExtensionDownload = (extensionPackage, tag) => {
 
 const main = async () => {
   if (!tagName || !versionToRelease) {
-    fail('Please provide the release tag, for example: pnpm draft-release v0.1.0');
+    fail('Please provide the release tag, for example: pnpm draft-release v0.1.0-rc1');
   }
 
   const rootPackage = readJson(rootPackagePath);

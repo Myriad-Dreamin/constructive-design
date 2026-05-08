@@ -2,7 +2,7 @@ import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.linker.interface.ModuleKind
 
 ThisBuild / scalaVersion := "3.3.3"
-ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / version := "0.1.0-rc1"
 
 lazy val root = project
   .in(file("."))
