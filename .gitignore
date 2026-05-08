@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+target/
+
+.bloop/
+.bsp/
+.metals/
+.scala-build/
+
+.env
+.env.*
+!.env.example
+
+*.log

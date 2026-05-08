@@ -1,0 +1,28 @@
+{
+  "name": "constructive-design",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.16.1",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "lint": "eslint .",
+    "scala:run": "scala-cli run src/main/scala --server=false",
+    "scala:sbt-fastLink": "sbt fastLinkJS",
+    "scala:sbt-run": "sbt run",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.12.3",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2"
+  }
+}

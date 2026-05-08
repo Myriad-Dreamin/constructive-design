@@ -1,0 +1,75 @@
+
+enum HeuristicStrategy {
+    case use_sibling
+    case use_parent_project
+    case use_nvcc
+    case not_confident
+}
+
+// Heuristic rules for compile command inference
+def HeuristicRules(extension: String, has_sibling_cpp: Boolean, in_include_dir: Boolean) -> HeuristicStrategy = {
+    extension match {
+        case ".h" | ".hpp" | ".inl" if has_sibling_cpp => HeuristicStrategy.use_sibling
+        case ".h" | ".hpp" if in_include_dir => HeuristicStrategy.use_parent_project
+        case ".cu" => HeuristicStrategy.use_nvcc
+        case _ => HeuristicStrategy.not_confident
+    }
+}
+
+// Resolve compile command for a file
+def SelectCompileCommand(
+    file_path: String, user_config: UserConfig, cdb: CompilationDatabase, include_graph: IncludeGraph) -> CompileCommand = {
+    ??? match {
+    case user_override =>
+        // User explicitly chose a command for this file
+        assert(used(user_config, file_path))
+    case cdb_lookup =>
+        // File exists in compilation database
+        assert(used(cdb, file_path))
+    case include_graph_lookup =>
+        // Use includer's command from include graph
+        assert(used(include_graph, file_path) && used(cdb, include_graph.includer(file_path)))
+    case heuristic_inference =>
+        // Infer from extension, sibling files, directory
+        @inline HeuristicRules(???, ???, ???)
+    case fallback =>
+        // Cannot determine compile command for file
+        throw s"Cannot determine compile command for {file_path}"
+    }
+}
+
+class OrderProcessing(order_id: String, amount: Double, payment_ref: String, tracking: String) {
+    // Awaiting payment
+    @initial
+    case Pending;
+    // Payment in progress
+    case Charging;
+    // Payment received
+    case Confirmed;
+    // In transit
+    case Shipping;
+    // Done
+    @terminal
+    case Delivered;
+    // Cancelled
+    @terminal
+    case Cancelled;
+
+    def transit: OrderProcessing = this match {
+        // Process payment
+        // ...
+        case Pending if pay() && amount > 0 => Charging
+        // Payment successful
+        case Charging if chargeOk() => Confirmed
+        // Payment failed
+        case Charging if chargeFail() => Cancelled
+        // Ship order
+        case Confirmed if ship() => Shipping
+        // Mark as delivered
+        case Shipping if deliver() => Delivered
+        // Cancel order before payment
+        case Pending if cancel() => Cancelled
+        case _ =>
+            throw s"Invalid transition from {this}"
+    }
+}
