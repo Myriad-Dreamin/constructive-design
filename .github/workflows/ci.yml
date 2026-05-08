@@ -100,6 +100,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build CLI executable
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p editors/vscode/dist/scala/design-ls
@@ -112,6 +113,24 @@ jobs:
             --js-mode fastLinkJS \
             --output editors/vscode/dist/scala/design-ls/main.js \
             --force \
+            --server=false
+          pnpm exec tsc -p tsconfig.json
+          node scripts/build-sea.mjs
+
+      - name: Build CLI executable
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force editors/vscode/dist/scala/design-ls | Out-Null
+          scala-cli package `
+            packages/design/src/main/scala `
+            packages/design-ls/src/main/scala `
+            --power `
+            --js `
+            --js-module-kind esmodule `
+            --js-mode fastLinkJS `
+            --output editors/vscode/dist/scala/design-ls/main.js `
+            --force `
             --server=false
           pnpm exec tsc -p tsconfig.json
           node scripts/build-sea.mjs
