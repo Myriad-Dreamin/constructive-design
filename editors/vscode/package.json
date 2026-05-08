@@ -1,6 +1,6 @@
 {
   "name": "constructive-design",
-  "version": "0.1.0-rc2",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "displayName": "Constructive Design",
   "description": "Design language support for VSCode.",
@@ -32,7 +32,7 @@
     "build:bundle": "rm -f dist/server.js dist/server.js.map dist/server.cjs && esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.cjs && esbuild src/server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs",
     "build:server": "pnpm build:scala-ls && pnpm build:bundle",
     "build:vscode": "pnpm build:syntax && pnpm build:server && pnpm package",
-    "local:vscode": "pnpm build:vscode && code --install-extension constructive-design-0.1.0-rc2.vsix",
+    "local:vscode": "pnpm build:vscode && code --install-extension constructive-design-0.1.0.vsix",
     "package": "vsce package --no-dependencies",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
