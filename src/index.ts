@@ -5,7 +5,7 @@ import * as sea from 'node:sea';
 import { fileURLToPath } from 'node:url';
 import * as vm from 'node:vm';
 
-const VERSION = '0.1.0-rc1';
+const VERSION = '0.1.1';
 const DEFAULT_CXX_OUTPUT_DIR = 'include';
 const DESIGN_LS_ASSET_KEY = 'design-ls/main.js';
 const SKIPPED_DIRECTORIES = new Set([
