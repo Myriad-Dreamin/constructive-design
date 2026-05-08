@@ -11,6 +11,6 @@ TypeScript project initialized with pnpm, ESLint, and Prettier.
 - `pnpm format:check`: check Prettier formatting
 - `pnpm check`: run lint, format check, and typecheck
 - `pnpm start`: run the compiled entry after `pnpm build`
-- `pnpm scala:run`: run the Scala.js entry with Node.js through Scala CLI
+- `pnpm scala:run`: parse `syntax/design.des` with Scala.js/FastParse on Node.js
 - `pnpm scala:sbt-run`: run the Scala.js entry with Node.js through sbt
 - `pnpm scala:sbt-fastLink`: build the fast Scala.js output with sbt

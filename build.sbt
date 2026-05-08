@@ -8,6 +8,7 @@ lazy val root = project
   .enablePlugins(ScalaJSPlugin)
   .settings(
     name := "constructive-design",
+    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "3.1.1",
     scalaJSUseMainModuleInitializer := true,
     jsEnv := new NodeJSEnv()
   )

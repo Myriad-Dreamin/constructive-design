@@ -9,10 +9,10 @@ enum HeuristicStrategy {
 // Heuristic rules for compile command inference
 def HeuristicRules(extension: String, has_sibling_cpp: Boolean, in_include_dir: Boolean) -> HeuristicStrategy = {
     extension match {
-        case ".h" | ".hpp" | ".inl" if has_sibling_cpp => HeuristicStrategy.use_sibling
-        case ".h" | ".hpp" if in_include_dir => HeuristicStrategy.use_parent_project
-        case ".cu" => HeuristicStrategy.use_nvcc
-        case _ => HeuristicStrategy.not_confident
+        case ".h" | ".hpp" | ".inl" if has_sibling_cpp => use_sibling
+        case ".h" | ".hpp" if in_include_dir => use_parent_project
+        case ".cu" => use_nvcc
+        case _ => not_confident
     }
 }
 
